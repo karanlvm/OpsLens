@@ -60,29 +60,82 @@ class MLService:
         model = model or settings.VLM_MODEL
         url = f"{self.base_url}/models/{model}"
         
-        # Read and encode image
+        # Read and encode image as base64
         with open(image_path, "rb") as f:
-            image_data = base64.b64encode(f.read()).decode("utf-8")
+            image_bytes = f.read()
+            image_data = base64.b64encode(image_bytes).decode("utf-8")
         
+        # Hugging Face Inference API format for vision-language models
+        # Format: data:image/jpeg;base64,<base64_data> or just base64
+        # For Qwen2-VL, we use the messages format
         payload = {
             "inputs": {
-                "image": image_data,
-                "text": prompt
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image",
+                                "image": image_data
+                            },
+                            {
+                                "type": "text",
+                                "text": prompt
+                            }
+                        ]
+                    }
+                ]
+            },
+            "parameters": {
+                "max_new_tokens": 512
             }
         }
         
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            response = await client.post(url, json=payload, headers=self.headers)
-            response.raise_for_status()
-            result = response.json()
-            
-            # Handle different response formats
-            if isinstance(result, list) and len(result) > 0:
-                return result[0].get("generated_text", "")
-            elif isinstance(result, dict):
-                return result.get("generated_text", "")
-            else:
-                return str(result)
+        try:
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                response = await client.post(url, json=payload, headers=self.headers)
+                
+                # Handle loading state (model might be loading)
+                if response.status_code == 503:
+                    # Model is loading, wait and retry
+                    import asyncio
+                    await asyncio.sleep(10)
+                    response = await client.post(url, json=payload, headers=self.headers)
+                
+                response.raise_for_status()
+                result = response.json()
+                
+                # Handle different response formats
+                if isinstance(result, list) and len(result) > 0:
+                    # Check for message format
+                    if isinstance(result[0], dict):
+                        if "generated_text" in result[0]:
+                            return result[0]["generated_text"]
+                        elif "message" in result[0]:
+                            return result[0]["message"].get("content", "")
+                    return str(result[0])
+                elif isinstance(result, dict):
+                    # Check for various response formats
+                    if "generated_text" in result:
+                        return result["generated_text"]
+                    elif "message" in result:
+                        return result["message"].get("content", "")
+                    elif "text" in result:
+                        return result["text"]
+                    elif "output" in result:
+                        return result["output"]
+                    else:
+                        # Return string representation
+                        return str(result)
+                else:
+                    return str(result)
+        except httpx.HTTPStatusError as e:
+            error_msg = f"HTTP {e.response.status_code}: {e.response.text}"
+            print(f"VLM API Error: {error_msg}")
+            raise Exception(f"VLM analysis failed: {error_msg}")
+        except Exception as e:
+            print(f"VLM Error: {str(e)}")
+            raise Exception(f"VLM analysis failed: {str(e)}")
     
     async def generate_embeddings(
         self,

@@ -87,6 +87,14 @@ async def create_incident(
     from app.workers.incident_worker import process_new_incident
     process_new_incident.delay(str(db_incident.id))
     
+    # Send webhook notification
+    try:
+        from app.services.webhook_service import WebhookService
+        webhook_service = WebhookService(db)
+        await webhook_service.notify_incident_created(db_incident)
+    except Exception as e:
+        print(f"Webhook notification failed: {e}")
+    
     return db_incident
 
 

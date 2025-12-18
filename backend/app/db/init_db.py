@@ -8,6 +8,7 @@ from app.db.models import (
     Incident, TimelineEvent, Hypothesis, EvidenceItem, 
     Action, Runbook, Postmortem
 )
+from app.auth.models import APIKey, WebhookEndpoint
 
 
 def init_db():

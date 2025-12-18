@@ -12,303 +12,330 @@
 
 </div>
 
-## 🎯 Overview
+## What is OpsLens?
 
-OpsLens is an end-to-end incident-response copilot that transforms messy, real-world signals (alerts, logs, metrics, traces, screenshots, runbooks, PRs) into actionable intelligence:
+Ever been on-call at 2 AM, frantically switching between PagerDuty, Slack, Grafana, GitHub, and your runbooks trying to figure out what's broken? OpsLens is here to help.
 
-- **Live incident timeline** - "What changed, when, and likely why"
-- **Ranked hypotheses** - AI-generated root cause analysis with supporting evidence
-- **Actionable next steps** - Queries to run, owners to page, rollback plans
-- **Postmortem drafts** - Automatic generation with root-cause candidates and follow-ups
+It's an AI-powered copilot that pulls together all those scattered signals—alerts, logs, metrics, screenshots, PRs—and turns them into something actually useful: a clear timeline of what happened, AI-generated hypotheses about the root cause, and actionable next steps. Think of it as your incident response co-pilot that never sleeps.
 
-### The Problem It Solves
+## What It Does
 
-On-call engineers waste precious time context-switching across tools (PagerDuty → Slack → Datadog/Grafana → GitHub → runbooks). OpsLens reduces MTTR (Mean Time To Resolution) by:
+When an incident hits, OpsLens:
 
-- **Connecting evidence across systems** - Automatically correlates alerts, deployments, and metrics
-- **Multimodal understanding** - Uses Vision-Language Models (VLM) to analyze dashboard screenshots
-- **Structured incident state** - Maintains a deterministic, trustworthy incident timeline
-- **AI-powered insights** - Generates hypotheses and suggests actions based on historical patterns
+- **Builds a timeline automatically** - Pulls in events from GitHub (recent deployments), PagerDuty (alerts), and other sources to show you what changed and when
+- **Analyzes screenshots with AI** - Upload a dashboard screenshot and it'll tell you what's wrong, what metrics are spiking, and what errors it sees
+- **Generates root cause hypotheses** - Uses AI to analyze all the evidence and suggest what might be causing the issue, ranked by confidence
+- **Suggests actions** - Gives you concrete next steps: queries to run, who to page, whether to rollback
+- **Drafts postmortems** - When it's all over, it'll generate a postmortem draft with root cause analysis and follow-up actions
 
-## ✨ Features
+## Features
 
-### Core Functionality
+### Real Integrations (Not Mock Data)
 
-- **🔗 Real-time Integrations**
-  - GitHub - Fetches recent PR merges and deployment information
-  - PagerDuty - Pulls active incidents and alerts
-  - Extensible architecture for additional integrations (Slack, Datadog, Grafana, etc.)
+- **GitHub** - Automatically fetches your recent PR merges and adds them to incident timelines. Works with both personal accounts and organizations.
+- **PagerDuty** - Pulls in active incidents and alerts, correlates them with your OpsLens incidents
+- **Webhooks** - Accept webhooks from GitHub, PagerDuty, or any custom system to automatically create incidents
 
-- **🤖 AI-Powered Analysis**
-  - **LLM Integration** (Llama 3.1) - Summarizes logs, generates hypotheses, drafts postmortems
-  - **VLM Integration** (Qwen2.5-VL) - Analyzes dashboard screenshots and extracts insights
-  - **RAG System** (BGE-M3) - Semantic search over runbooks and historical postmortems
+### AI That Actually Works
 
-- **📊 Incident Management**
-  - Event-driven timeline generation
-  - Deterministic incident state machine
-  - Evidence correlation and ranking
-  - Action tracking and completion
+- **LLM (Llama 3.1)** - Summarizes logs, generates hypotheses, writes postmortems. All via Hugging Face's Inference API, so no need to host massive models yourself.
+- **VLM (Qwen2.5-VL)** - Upload a screenshot of your Grafana dashboard and it'll tell you what it sees: errors, anomalies, key metrics. Pretty wild, honestly.
+- **RAG (BGE-M3)** - Semantic search over your runbooks and historical postmortems. Ask "how do I fix database connection issues?" and it'll find the relevant runbook.
 
-- **🎨 Modern UI**
-  - War Room view with live timeline
-  - Evidence viewer with screenshot understanding
-  - Hypothesis ranking with confidence scores
-  - Action queue with completion tracking
+### Built for Integration
 
-## 🏗️ Architecture
+- **REST API** - Full REST API with OpenAPI docs. Create incidents, upload evidence, generate hypotheses—all programmatically
+- **API Key Authentication** - Secure your API with API keys. Optional in dev, required in production
+- **Webhooks** - Both incoming (GitHub, PagerDuty) and outgoing (notify your systems when incidents are created/updated)
+- **Test Endpoints** - Built-in endpoints to test your integrations and verify everything's working
 
-### Tech Stack
-
-**Backend:**
-- **FastAPI** - High-performance async API framework
-- **PostgreSQL + pgvector** - Relational database with vector embeddings support
-- **Celery + Redis** - Distributed task queue for async processing
-- **Hugging Face Inference API** - LLM, VLM, and embedding models
-
-**Frontend:**
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first styling
-
-**Infrastructure:**
-- **Docker Compose** - Containerized development environment
-- **Postgres with pgvector extension** - Vector similarity search
-- **Redis** - Task queue and caching
-
-### System Architecture
-
-```
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│   Frontend  │────▶│   FastAPI    │────▶│  PostgreSQL │
-│  (Next.js)  │     │   Backend    │     │  + pgvector │
-└─────────────┘     └──────────────┘     └─────────────┘
-                            │
-                            ├────▶ Celery Workers
-                            │         │
-                            │         ├── GitHub Integration
-                            │         ├── PagerDuty Integration
-                            │         └── ML Processing
-                            │
-                            └────▶ Hugging Face API
-                                   (LLM, VLM, Embeddings)
-```
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- Docker Desktop installed and running
-- API keys for:
-  - [Hugging Face](https://huggingface.co/settings/tokens) (free tier available)
-  - [GitHub](https://github.com/settings/tokens) (Personal Access Token with `repo` scope)
-  - [PagerDuty](https://support.pagerduty.com/docs/api-keys) (API key from your account)
+You'll need:
+- Docker Desktop (make sure it's running)
+- API keys (all free tiers work fine):
+  - [Hugging Face](https://huggingface.co/settings/tokens) - for AI models
+  - [GitHub](https://github.com/settings/tokens) - Personal Access Token with `repo` scope
+  - [PagerDuty](https://support.pagerduty.com/docs/api-keys) - API key from your account
 
 ### Installation
 
-1. **Clone the repository:**
+1. **Clone it:**
    ```bash
    git clone https://github.com/yourusername/OpsLens.git
    cd OpsLens
    ```
 
-2. **Set up environment variables:**
+2. **Set up your API keys:**
    ```bash
    cp secrets.env.example secrets.env
-   # Edit secrets.env and add your API keys
+   # Open secrets.env and paste your API keys
    ```
 
-3. **Start the application:**
+3. **Start everything:**
    ```bash
    ./setup.sh
    ```
    
-   Or manually:
-   ```bash
-   docker-compose up -d
-   docker-compose exec backend python -m app.db.init_db
-   docker-compose exec backend python -m app.data.generate_synthetic
-   ```
+   This will start all the services, initialize the database, and optionally generate some realistic test data.
 
-4. **Access the application:**
+4. **Open it up:**
    - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
+   - API Docs: http://localhost:8000/docs (interactive Swagger UI)
+   - Backend: http://localhost:8000
 
-## 📁 Project Structure
+That's it! You should see the frontend with some sample incidents (if you generated synthetic data).
+
+## How to Use It
+
+### View Incidents
+
+Just go to http://localhost:3000. You'll see a list of incidents. Click on any one to dive into the details.
+
+### Generate a Timeline
+
+On an incident page, click "Generate Timeline". OpsLens will:
+- Fetch recent GitHub PR merges (last 24 hours)
+- Pull in PagerDuty incidents
+- Correlate everything chronologically
+- Show you a clean timeline of what happened
+
+### Analyze a Screenshot
+
+Got a dashboard screenshot? Upload it in the Evidence tab. The VLM will analyze it and tell you:
+- What errors it sees
+- What metrics are spiking
+- Any anomalies it notices
+- A plain-English description of what's on the dashboard
+
+Processing happens in the background, so give it a few seconds and refresh.
+
+### Generate Hypotheses
+
+Click "Generate Hypotheses" and the AI will:
+- Analyze all the evidence (logs, metrics, screenshots)
+- Generate root cause hypotheses
+- Rank them by confidence
+- Link them to supporting evidence
+
+### Set Up Webhooks
+
+Want incidents to be created automatically? Set up webhooks:
+
+**GitHub:**
+1. Go to your repo → Settings → Webhooks
+2. Add webhook: `https://your-domain.com/api/v1/webhooks/github`
+3. Select "Pull requests" events
+
+**PagerDuty:**
+1. PagerDuty → Integrations → Webhooks
+2. Add webhook: `https://your-domain.com/api/v1/webhooks/pagerduty`
+3. Select incident events
+
+Now when PRs merge or PagerDuty alerts fire, incidents are created automatically!
+
+## Testing Your Setup
+
+### Test Integrations
+
+```bash
+# Test GitHub connection
+curl http://localhost:8000/api/v1/integrations/test/github
+
+# Test PagerDuty connection
+curl http://localhost:8000/api/v1/integrations/test/pagerduty
+
+# Test everything
+curl http://localhost:8000/api/v1/integrations/test/all
+```
+
+### Test VLM
+
+```bash
+# Check if VLM is ready
+curl http://localhost:8000/api/v1/test/vlm/status
+
+# Test with an actual screenshot
+curl -X POST http://localhost:8000/api/v1/test/vlm \
+  -F "file=@your_screenshot.png"
+```
+
+### Test Webhooks
+
+```bash
+# Test webhook endpoint
+curl http://localhost:8000/api/v1/webhooks/test
+
+# Send a test webhook
+curl -X POST http://localhost:8000/api/v1/webhooks/generic \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Test Incident", "severity": "medium"}'
+```
+
+## Project Structure
 
 ```
 OpsLens/
-├── backend/                 # FastAPI backend
+├── backend/              # FastAPI backend
 │   ├── app/
-│   │   ├── api/            # REST API endpoints
-│   │   │   ├── incidents.py
-│   │   │   ├── evidence.py
-│   │   │   ├── hypotheses.py
-│   │   │   ├── runbooks.py
-│   │   │   └── integrations.py
-│   │   ├── db/             # Database models and setup
-│   │   │   ├── models.py
-│   │   │   └── init_db.py
-│   │   ├── integrations/   # External service integrations
-│   │   │   ├── github.py
-│   │   │   └── pagerduty.py
-│   │   ├── services/        # Business logic
-│   │   │   ├── ml_service.py
-│   │   │   ├── rag_service.py
-│   │   │   └── incident_service.py
-│   │   ├── workers/         # Celery async tasks
-│   │   │   ├── incident_worker.py
-│   │   │   └── evidence_worker.py
-│   │   ├── data/            # Data generation utilities
-│   │   │   └── generate_synthetic.py
-│   │   ├── config.py        # Configuration management
-│   │   ├── main.py          # FastAPI application
-│   │   └── celery_app.py   # Celery configuration
-│   ├── requirements.txt
-│   └── Dockerfile
-├── frontend/                # Next.js frontend
-│   ├── app/                # Next.js app directory
-│   │   ├── page.tsx         # Incident list
-│   │   ├── incidents/[id]/  # Incident detail page
-│   │   └── layout.tsx
-│   ├── lib/                 # Utilities
-│   │   ├── api.ts          # API client
-│   │   └── types.ts        # TypeScript types
-│   ├── package.json
-│   └── Dockerfile
-├── docker-compose.yml       # Docker orchestration
-├── setup.sh                 # Setup script
-├── secrets.env.example      # Environment template
-└── README.md
+│   │   ├── api/         # REST endpoints (incidents, evidence, webhooks, auth)
+│   │   ├── auth/        # Authentication (API keys, JWT)
+│   │   ├── db/          # Database models
+│   │   ├── integrations/# GitHub, PagerDuty
+│   │   ├── services/    # Business logic (ML, RAG, incidents)
+│   │   └── workers/    # Celery async tasks
+│   └── requirements.txt
+├── frontend/            # Next.js frontend
+│   ├── app/            # Pages and components
+│   └── lib/            # API client, types
+└── docker-compose.yml  # All services
 ```
 
-## 🔧 Development
+## Tech Stack
+
+**Backend:**
+- FastAPI - Fast, modern Python web framework
+- PostgreSQL + pgvector - Database with vector search built-in
+- Celery + Redis - Background job processing
+- Hugging Face Inference API - AI models without the infrastructure headache
+
+**Frontend:**
+- Next.js 14 - React framework
+- TypeScript - Type safety
+- Tailwind CSS - Styling
+
+**Infrastructure:**
+- Docker Compose - Everything containerized
+- All services run in containers for easy setup
+
+## API & Authentication
+
+### Using the API
+
+The API is fully documented at http://localhost:8000/docs. You can try endpoints right there.
+
+### Authentication
+
+By default, authentication is **disabled** for easy development. To enable it:
+
+1. Set `ENABLE_AUTH=true` in your config
+2. Create an API key:
+   ```bash
+   curl -X POST http://localhost:8000/api/v1/auth/api-keys \
+     -H "Content-Type: application/json" \
+     -d '{"name": "My Integration"}'
+   ```
+3. Use it:
+   ```bash
+   curl -H "X-API-Key: your-key" \
+     http://localhost:8000/api/v1/incidents
+   ```
+
+See [API_AUTHENTICATION.md](API_AUTHENTICATION.md) for the full guide.
+
+### Webhooks
+
+OpsLens supports both incoming and outgoing webhooks:
+
+- **Incoming:** GitHub, PagerDuty, or generic webhooks create incidents automatically
+- **Outgoing:** OpsLens can notify your systems when incidents are created/updated
+
+Check out [WEBHOOKS.md](WEBHOOKS.md) for setup instructions.
+
+## Development
 
 ### Running Locally
 
 ```bash
-# Start all services
+# Start everything
 docker-compose up -d
 
 # View logs
-docker-compose logs -f [service_name]
+docker-compose logs -f backend
 
 # Restart a service
-docker-compose restart [service_name]
+docker-compose restart backend
 
-# Stop all services
+# Stop everything
 docker-compose down
-```
-
-### Testing Integrations
-
-Test your GitHub and PagerDuty integrations:
-
-```bash
-# Test GitHub
-curl http://localhost:8000/api/v1/integrations/test/github
-
-# Test PagerDuty
-curl http://localhost:8000/api/v1/integrations/test/pagerduty
-
-# Test all
-curl http://localhost:8000/api/v1/integrations/test/all
 ```
 
 ### Adding New Integrations
 
-1. Create integration module in `backend/app/integrations/`
-2. Add API endpoints in `backend/app/api/integrations.py`
-3. Create Celery tasks for async processing
-4. Update incident worker to use new integration
+The architecture makes it easy to add new integrations:
 
-## 📖 Usage
+1. Create a new file in `backend/app/integrations/`
+2. Add test endpoints in `backend/app/api/integrations.py`
+3. Wire it into the incident worker
+4. Done!
 
-### Creating an Incident
+See the GitHub and PagerDuty integrations for examples.
 
-1. Navigate to http://localhost:3000
-2. View existing incidents or create a new one via API
-3. Click on an incident to view details
+## What's Next?
 
-### Generating Timeline
+This is an MVP, but it's fully functional. Here's what's coming:
 
-1. Open an incident detail page
-2. Click "Generate Timeline" button
-3. System will:
-   - Fetch recent GitHub PR merges (last 24 hours)
-   - Fetch recent PagerDuty incidents
-   - Correlate events chronologically
-   - Display in timeline view
+- **More integrations** - Slack, Datadog, Grafana, OpenTelemetry
+- **Better AI** - Fine-tuned models, better hypothesis generation
+- **Production features** - RBAC, audit logging, multi-tenant support
+- **Evaluation** - Metrics to measure how well the AI is performing
 
-### Analyzing Screenshots
+Check the [roadmap section](#roadmap) for more details.
 
-1. Go to the Evidence tab
-2. Upload a dashboard screenshot
-3. VLM will analyze and extract:
-   - Error patterns
-   - Metric anomalies
-   - Important insights
+## Troubleshooting
 
-### Generating Hypotheses
+**Services won't start?**
+- Make sure Docker Desktop is running
+- Check if ports 3000, 8000, 5432, 6379 are free
+- Look at logs: `docker-compose logs backend`
 
-1. Click "Generate Hypotheses" on an incident
-2. AI will analyze evidence and generate:
-   - Root cause hypotheses
-   - Confidence scores
-   - Supporting evidence links
+**API keys not working?**
+- Verify your keys in `secrets.env`
+- Test the integration endpoints (see above)
+- Check the logs for error messages
 
-## 🧪 Testing
+**VLM not analyzing screenshots?**
+- Make sure your Hugging Face API key is set
+- Check the VLM status endpoint
+- First request might take 30-60 seconds (model loading)
 
-The project includes realistic synthetic data for testing:
+**Webhooks not working?**
+- Verify the webhook URL is accessible
+- Check webhook secret matches
+- Look at backend logs for incoming webhooks
 
-```bash
-docker-compose exec backend python -m app.data.generate_synthetic
-```
+## Contributing
 
-This generates 5 realistic incident scenarios with:
-- Coherent timelines
-- Relevant evidence
-- Realistic hypotheses
-- Actionable next steps
+Found a bug? Have an idea? Pull requests welcome! This is a portfolio project, so contributions that make it more impressive are especially appreciated.
 
-## 🔐 Security
+## License
 
-- API keys stored in `secrets.env` (not committed to git)
-- Environment-based configuration
-- Input validation on all endpoints
-- SQL injection protection via SQLAlchemy ORM
+MIT License - do whatever you want with it.
 
-## 🛣️ Roadmap
+## Documentation
 
-- [ ] Slack integration for incident threads
+- [API Authentication Guide](API_AUTHENTICATION.md) - Setting up API keys and security
+- [Webhooks Guide](WEBHOOKS.md) - Incoming and outgoing webhooks
+- [VLM Testing](TEST_VLM.md) - Testing the vision-language model
+- [Integration Guide](INTEGRATION_GUIDE.md) - Integrating OpsLens into your systems
+
+## Roadmap
+
+- [x] ~~API key authentication~~ ✅ Done
+- [x] ~~Webhook support (incoming & outgoing)~~ ✅ Done
+- [x] ~~VLM screenshot analysis~~ ✅ Done
+- [x] ~~GitHub & PagerDuty integrations~~ ✅ Done
+- [ ] Slack integration (incident threads, notifications)
 - [ ] Datadog/Grafana metrics integration
 - [ ] OpenTelemetry trace correlation
 - [ ] Kubernetes event ingestion
-- [ ] Webhook support for real-time updates
 - [ ] Advanced RAG with fine-tuning
 - [ ] Evaluation harness for ML models
 - [ ] Role-based access control
-- [ ] Audit logging
 - [ ] Multi-tenant support
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- [Hugging Face](https://huggingface.co/) for ML model hosting
-- [FastAPI](https://fastapi.tiangolo.com/) for the excellent framework
-- [Next.js](https://nextjs.org/) for the React framework
-- [pgvector](https://github.com/pgvector/pgvector) for vector similarity search
-
-## 📧 Contact
-
-For questions or support, please open an issue on GitHub
-
 ---
+
+**Built for on-call engineers who are tired of context-switching at 2 AM.**

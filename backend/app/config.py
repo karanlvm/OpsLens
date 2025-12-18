@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     VLM_MODEL: str = "Qwen/Qwen2-VL-2B-Instruct"
     EMBEDDING_MODEL: str = "BAAI/bge-m3"
     
+    # Security
+    ENABLE_AUTH: bool = False  # Set to True to enable API key authentication
+    
     class Config:
         env_file = "secrets.env"
         case_sensitive = True
