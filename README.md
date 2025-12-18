@@ -18,6 +18,28 @@ Ever been on-call at 2 AM, frantically switching between PagerDuty, Slack, Grafa
 
 It's an AI-powered copilot that pulls together all those scattered signals—alerts, logs, metrics, screenshots, PRs—and turns them into something actually useful: a clear timeline of what happened, AI-generated hypotheses about the root cause, and actionable next steps. Think of it as your incident response co-pilot that never sleeps.
 
+## Screenshots
+
+<div align="center">
+
+### Incident List View
+![Incident List](images/Screenshot%202025-12-18%20at%2012.00.59%20PM.png)
+*View all incidents at a glance with severity, status, and timestamps*
+
+### Incident Detail - Timeline
+![Incident Timeline](images/Screenshot%202025-12-18%20at%2012.01.10%20PM.png)
+*Chronological timeline showing events from GitHub, PagerDuty, and other sources*
+
+### Incident Detail - Hypotheses
+![Incident Hypotheses](images/Screenshot%202025-12-18%20at%2012.01.18%20PM.png)
+*AI-generated root cause hypotheses ranked by confidence with supporting evidence*
+
+### Incident Detail - Evidence
+![Incident Evidence](images/Screenshot%202025-12-18%20at%2012.01.27%20PM.png)
+*All evidence in one place: logs, metrics, screenshots, and their AI analysis*
+
+</div>
+
 ## What It Does
 
 When an incident hits, OpsLens:
@@ -35,6 +57,8 @@ When an incident hits, OpsLens:
 - **GitHub** - Automatically fetches your recent PR merges and adds them to incident timelines. Works with both personal accounts and organizations.
 - **PagerDuty** - Pulls in active incidents and alerts, correlates them with your OpsLens incidents
 - **Webhooks** - Accept webhooks from GitHub, PagerDuty, or any custom system to automatically create incidents
+
+See the screenshots above to see the UI in action—the incident list, timeline view, hypotheses, and evidence viewer.
 
 ### AI That Actually Works
 
@@ -92,33 +116,37 @@ That's it! You should see the frontend with some sample incidents (if you genera
 
 ### View Incidents
 
-Just go to http://localhost:3000. You'll see a list of incidents. Click on any one to dive into the details.
+Just go to http://localhost:3000. You'll see a list of incidents (like in the first screenshot above). Each incident shows its severity, status, and when it was created. Click on any one to dive into the details.
 
 ### Generate a Timeline
 
-On an incident page, click "Generate Timeline". OpsLens will:
+On an incident page, click "Generate Timeline" (see the timeline screenshot above). OpsLens will:
 - Fetch recent GitHub PR merges (last 24 hours)
 - Pull in PagerDuty incidents
 - Correlate everything chronologically
 - Show you a clean timeline of what happened
 
+The timeline view shows all events in chronological order, making it easy to see what changed and when.
+
 ### Analyze a Screenshot
 
-Got a dashboard screenshot? Upload it in the Evidence tab. The VLM will analyze it and tell you:
+Got a dashboard screenshot? Upload it in the Evidence tab (see the evidence screenshot above). The VLM will analyze it and tell you:
 - What errors it sees
 - What metrics are spiking
 - Any anomalies it notices
 - A plain-English description of what's on the dashboard
 
-Processing happens in the background, so give it a few seconds and refresh.
+Processing happens in the background, so give it a few seconds and refresh. The analysis will appear in the evidence content.
 
 ### Generate Hypotheses
 
-Click "Generate Hypotheses" and the AI will:
+Click "Generate Hypotheses" (see the hypotheses screenshot above) and the AI will:
 - Analyze all the evidence (logs, metrics, screenshots)
 - Generate root cause hypotheses
 - Rank them by confidence
 - Link them to supporting evidence
+
+The hypotheses are ranked by confidence, so you know which ones to investigate first.
 
 ### Set Up Webhooks
 
