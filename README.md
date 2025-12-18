@@ -23,19 +23,19 @@ It's an AI-powered copilot that pulls together all those scattered signals—ale
 <div align="center">
 
 ### Incident List View
-![Incident List](images/Screenshot%202025-12-18%20at%2012.00.59%20PM.png)
+![Incident List](images/1.png)
 *View all incidents at a glance with severity, status, and timestamps*
 
 ### Incident Detail - Timeline
-![Incident Timeline](images/Screenshot%202025-12-18%20at%2012.01.10%20PM.png)
+![Incident Timeline](images/2.png)
 *Chronological timeline showing events from GitHub, PagerDuty, and other sources*
 
 ### Incident Detail - Hypotheses
-![Incident Hypotheses](images/Screenshot%202025-12-18%20at%2012.01.18%20PM.png)
+![Incident Hypotheses](images/3.png)
 *AI-generated root cause hypotheses ranked by confidence with supporting evidence*
 
 ### Incident Detail - Evidence
-![Incident Evidence](images/Screenshot%202025-12-18%20at%2012.01.27%20PM.png)
+![Incident Evidence](images/4.png)
 *All evidence in one place: logs, metrics, screenshots, and their AI analysis*
 
 </div>
