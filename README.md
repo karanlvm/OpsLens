@@ -309,8 +309,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📧 Contact
 
-For questions or support, please open an issue on GitHub.
+For questions or support, please open an issue on GitHub
 
 ---
-
-**Built with ❤️ for on-call engineers everywhere**
